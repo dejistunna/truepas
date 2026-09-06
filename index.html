@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Discord & Open Graph Meta Tags -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="day1s" />
+<meta property="og:title" content="est. 2022" />
+<meta property="og:description" content="demps owns this" />
+<meta property="og:image" content="" />
+<meta name="theme-color" content="#232423" />
+
+<title> day zeros </title>
+<link rel="icon" type="image/png" href="">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    background: #000;
+    color: white;
+    overflow-x: hidden;
+}
+
+/* Starfall Canvas Background */
+#starfall-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.95;
+    display: block;
+}
+
+/* TOP LEFT VOLUME CONTROL */
+.top-volume-control {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 14px;
+    background: rgba(13, 13, 15, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.top-volume-control:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+#top-volume-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    opacity: 0.85;
+}
+
+#top-volume-btn:hover {
+    transform: scale(1.15);
+    opacity: 1;
+}
+
+#top-volume-btn svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.3));
+}
+
+.slider-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+#top-volume-slider {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 90px;
+    height: 5px;
+    outline: none;
+    cursor: pointer;
+    border-radius: 99px;
+    background: linear-gradient(to right, #ffffff var(--progress, 50%), rgba(255, 255, 255, 0.15) var(--progress, 50%));
+}
+
+#top-volume-slider::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+.volume-badge {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    color: rgba(255, 255, 255, 0.8);
+    margin-left: 8px;
+    min-width: 32px;
+    text-align: right;
+    user-select: none;
+}
+
+/* CLICK TO ENTER SCREEN */
+#enter-screen {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    overflow: hidden;
+    cursor: pointer;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+.enter-content {
+    position: relative;
+    z-index: 2;
+    width: min(430px, 80vw);
+    text-align: center;
+}
+
+.enter-logo-img-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 10px;
+    border-radius: 16px;
+}
+
+.enter-logo-img {
+    display: block;
+    width: clamp(160px, 22vw, 260px);
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.35));
+}
+
+.enter-line {
+    width: 100%;
+    height: 1px;
+    margin: 22px auto 13px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.75), transparent);
+}
+
+.enter-prompt {
+    font-size: 8px;
+    letter-spacing: 4px;
+    color: rgba(255,255,255,0.65);
+    text-transform: uppercase;
+}
+
+/* MAIN WEBSITE LAYOUT */
+#website {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: transparent;
+    z-index: 2;
+    padding: 40px 20px 100px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+header {
+    width: 100%;
+    margin-bottom: 35px;
+    text-align: center;
+}
+
+@keyframes delayedColorShift {
+    0%, 25% { background-position: 0% 50%; }
+    50%, 75% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.hall-of-fame-title {
+    font-size: clamp(20px, 2.5vw, 28px);
+    font-weight: 900;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    background: linear-gradient(270deg, #ffffff, #888888, #111111, #888888, #ffffff);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: delayedColorShift 6s ease-in-out infinite;
+}
+
+.content-section {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+}
+
+.content-section.active {
+    display: flex;
+}
+
+/* PROFILES GRID */
+.profiles {
+    width: min(1000px, 100%);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 24px;
+    align-items: start;
+}
+
+.profile-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-wrapper.hof-card-style {
+    width: 100%;
+    height: 140px;
+    background: rgba(13, 13, 15, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-wrapper.hof-card-style:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.45);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 255, 255, 0.2);
+}
+
+.hof-card-banner {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.45) blur(1px);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.hof-card-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    overflow: visible;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lanyard-card-body {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lanyard-avatar-wrap {
+    position: relative;
+    width: 90px;
+    height: 90px;
+}
+
+.profile-wrapper:not(.hof-card-style) .lanyard-avatar-wrap {
+    width: 110px;
+    height: 110px;
+}
+
+.lanyard-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.25);
+    background: #171719;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.profile-wrapper:not(.hof-card-style) .lanyard-avatar {
+    width: 110px;
+    height: 110px;
+}
+
+.profile:hover .lanyard-avatar {
+    transform: scale(1.2);
+    border-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.85), 0 0 25px rgba(255, 255, 255, 0.35);
+}
+
+/* GLOBAL POPUP STYLES */
+.profile-popup {
+    position: fixed;
+    width: 300px;
+    background: #121216;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 16px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.95), 0 0 30px rgba(0,0,0,0.8);
+    z-index: 999999999; 
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px) scale(0.98);
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                visibility 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.profile-popup.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.popup-banner {
+    position: relative;
+    width: 100%;
+    height: 100px;
+    background: #1a1a1e;
+    overflow: hidden;
+}
+
+.popup-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.popup-content-inner {
+    position: relative;
+    padding: 0 16px 16px 16px;
+    background: #121216;
+}
+
+.popup-avatar-wrapper {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    margin-top: -36px;
+    margin-bottom: 10px;
+    border-radius: 50%;
+    border: 4px solid #121216;
+    background: #121216;
+    overflow: hidden;
+    z-index: 2;
+}
+
+.popup-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.popup-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+}
+
+.popup-display-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.popup-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.12);
+    margin: 10px 0;
+}
+
+.popup-bio-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 4px;
+}
+
+.popup-bio {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+/* RESPONSIVE GRID */
+@media (max-width: 900px) {
+    #website {
+        padding: 40px 20px 100px 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .profiles {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+<canvas id="starfall-canvas" aria-hidden="true"></canvas>
+
+<!-- Main Background Audio Track -->
+<audio id="bgMusic" loop preload="auto">
+    <source src="https://file.garden/ao7OmgdIKCEqiKRi/Hev%20Abi%20-%20Binibiroksi%20(official%20visualizer)%20(1).mp3" type="audio/mpeg">
+</audio>
+
+<!-- Secondary Audio Element for Instant Profile Hovers -->
+<audio id="profileMusic" preload="auto">
+    <source src="" type="audio/mpeg">
+</audio>
+
+<!-- GLOBAL FLOATING PROFILE POPUP TOOLTIP -->
+<div id="global-profile-popup" class="profile-popup">
+    <div class="popup-banner">
+        <img class="popup-banner-img" src="" alt="">
+    </div>
+    <div class="popup-content-inner">
+        <div class="popup-avatar-wrapper">
+            <img class="popup-avatar" src="" alt="">
+        </div>
+        <div class="popup-header">
+            <span class="popup-display-name">Loading...</span>
+        </div>
+        <div class="popup-divider"></div>
+        <div class="popup-bio-title">MOTTO</div>
+        <div class="popup-bio"></div>
+    </div>
+</div>
+
+<!-- TOP LEFT VOLUME ADJUSTER -->
+<div id="top-volume-control" class="top-volume-control">
+    <button id="top-volume-btn" title="Mute / Unmute" aria-label="Mute / Unmute">
+        <svg id="volume-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77-2.99-7.86-7-8.77z"/>
+        </svg>
+    </button>
+    <div class="slider-wrapper">
+        <input id="top-volume-slider" type="range" min="0" max="1" step="0.01" value="0.5" aria-label="Volume">
+        <span id="volume-percentage" class="volume-badge">50%</span>
+    </div>
+</div>
+
+<!-- CLICK TO ENTER SCREEN -->
+<div id="enter-screen">
+    <div class="enter-content">
+        <div class="enter-logo-img-wrapper">
+            <img src="https://file.garden/ap0muy2dU43zRF3G/adenstar" alt="aden" class="enter-logo-img">
+        </div>
+        <div class="enter-line"></div>
+        <div class="enter-prompt">demps is da goat</div>
+    </div>
+</div>
+
+<!-- MAIN WEBSITE -->
+<div id="website">
+    <!-- Hall of Fame Section -->
+    <div id="hall-of-fame-section" class="content-section active">
+        <header>
+            <h1 class="hall-of-fame-title">Hall of Fame</h1>
+        </header>
+
+        <div class="profiles">
+            <!-- Profile 1 -->
+            <div class="profile-wrapper hof-card-style" data-bio="paano ka aangat kung di ka manghihila pababa" data-user-id="1180525578374361108">
+                <img class="hof-card-banner" src="" alt="">
+                <div class="hof-card-content">
+                    <div class="profile" data-user-id="1180525578374361108"></div>
+                </div>
+            </div>
+            <!-- Profile 2 -->
+            <div class="profile-wrapper hof-card-style" data-bio="Something you've done, it will never be gone" data-user-id="1535329294350553170">
+                <img class="hof-card-banner" src="" alt="">
+                <div class="hof-card-content">
+                    <div class="profile" data-user-id="1535329294350553170"></div>
+                </div>
+            </div>
+            <!-- Profile 3 -->
+            <div class="profile-wrapper hof-card-style" data-bio="isang kiss ko lang yan wala na yan!" data-user-id="1231458237962911804">
+                <img class="hof-card-banner" src="" alt="">
+                <div class="hof-card-content">
+                    <div class="profile" data-user-id="1231458237962911804"></div>
+                </div>
+            </div>
+            <!-- Profile 4 -->
+            <div class="profile-wrapper hof-card-style" data-bio="when life gives you lemons, squeeze it on a man's eye" data-user-id="1218899442074255524">
+                <img class="hof-card-banner" src="" alt="">
+                <div class="hof-card-content">
+                    <div class="profile" data-user-id="1218899442074255524"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+  const customBanners = {
+    "1180525578374361108": "https://file.garden/ap0muy2dU43zRF3G/drake", 
+    "1535329294350553170": "https://file.garden/ap0muy2dU43zRF3G/brown",
+    "1218899442074255524": "https://file.garden/ap0muy2dU43zRF3G/che",
+    "1231458237962911804": "https://file.garden/ap0muy2dU43zRF3G/nelly"
+  };
+
+  const customNames = {
+    "1180525578374361108": "demps",
+    "1535329294350553170": "karl",
+    "1231458237962911804": "nelly",
+    "1218899442074255524": "che"
+  };
+
+  const customAvatars = {
+    "1180525578374361108": "https://file.garden/ap0muy2dU43zRF3G/demps",
+    "1535329294350553170": "https://file.garden/ap0muy2dU43zRF3G/karl",
+    "1231458237962911804": "https://file.garden/ap0muy2dU43zRF3G/nelly2",
+    "1218899442074255524": "https://file.garden/ap0muy2dU43zRF3G/che"
+  };
+
+  const customAudioTracks = {
+    "1180525578374361108": "https://file.garden/ap0muy2dU43zRF3G/Drake%20-%20I%20Get%20Lonely%20(432Hz)%20%5BcoUtGPcQZgI%5D.mp3",
+    "1535329294350553170": "https://file.garden/ap0muy2dU43zRF3G/Hozier%20-%20Too%20Sweet%20(Official%20Lyric%20Video)%20%5BaezstCBHOPQ%5D.mp3",
+    "1218899442074255524": "https://file.garden/ap0muy2dU43zRF3G/Chase%20Atlantic%20-%20Slow%20Down%20_%20Lyrics%20%5BeLxXIg3_7Zc%5D.mp3",
+    "1231458237962911804": "https://file.garden/ap0muy2dU43zRF3G/Jeff%20Buckley%20-%20Lover%2C%20You%20Should'veCome%20Over%20-%20best%20part%20-%20zac%20(192k).mp3"
+  };
+
+  const music = document.getElementById("bgMusic");
+  const profileMusic = document.getElementById("profileMusic");
+  const topVolumeBtn = document.getElementById("top-volume-btn");
+  const topVolumeSlider = document.getElementById("top-volume-slider");
+  const volumeBadge = document.getElementById("volume-percentage");
+
+  music.volume = 0.5;
+  profileMusic.volume = 0.5;
+
+  function paintVolumeRange(percent) {
+      topVolumeSlider.style.setProperty("--progress", `${Math.max(0, Math.min(100, percent))}%`);
+  }
+
+  function updateVolumeUI() {
+      const vol = music.muted ? 0 : music.volume;
+      const percent = Math.round(vol * 100);
+      topVolumeSlider.value = vol;
+      paintVolumeRange(percent);
+      volumeBadge.textContent = `${percent}%`;
+  }
+
+  topVolumeSlider.addEventListener("input", () => {
+      const val = Number(topVolumeSlider.value);
+      music.muted = false;
+      music.volume = val;
+      profileMusic.volume = val;
+      updateVolumeUI();
+  });
+
+  topVolumeBtn.addEventListener("click", () => {
+      music.muted = !music.muted;
+      profileMusic.muted = music.muted;
+      updateVolumeUI();
+  });
+
+  paintVolumeRange(50);
+
+  /* Global Popup Tooltip Element Logic */
+  const globalPopup = document.getElementById("global-profile-popup");
+  const popupBannerImg = globalPopup.querySelector(".popup-banner-img");
+  const popupNameEl = globalPopup.querySelector(".popup-display-name");
+  const popupBioEl = globalPopup.querySelector(".popup-bio");
+  const popupAvatarEl = globalPopup.querySelector(".popup-avatar");
+
+  function showPopup(wrapper, data) {
+      const user = data.discord_user || {};
+      const userId = user.id;
+      const displayName = customNames[userId] || user.global_name || user.username || "Unknown User";
+
+      const avatarUrl = customAvatars[userId] || (user.avatar
+          ? `https://cdn.discordapp.com/avatars/${userId}/${user.avatar}.png?size=256`
+          : `https://api.lanyard.rest/${userId}.png`);
+
+      const bannerUrl = customBanners[userId] || `https://discord.tsunstudio.pw/api/banner/${encodeURIComponent(userId)}/image`;
+
+      let bioText = user.bio || (data.activities && data.activities.length > 0 ? `Playing ${data.activities[0].name}` : "");
+      if (wrapper.dataset.bio !== undefined) {
+          bioText = wrapper.dataset.bio;
+      }
+
+      popupBannerImg.src = bannerUrl;
+      popupNameEl.textContent = displayName;
+      popupBioEl.textContent = bioText;
+      popupAvatarEl.src = avatarUrl;
+
+      const rect = wrapper.getBoundingClientRect();
+      const popupWidth = 300;
+      let leftPos = rect.left + (rect.width / 2) - (popupWidth / 2);
+      let topPos = rect.bottom + 12;
+
+      if (leftPos < 15) leftPos = 15;
+      if (leftPos + popupWidth > window.innerWidth - 15) {
+          leftPos = window.innerWidth - popupWidth - 15;
+      }
+
+      if (topPos + 260 > window.innerHeight) {
+          topPos = rect.top - 12 - globalPopup.offsetHeight;
+      }
+
+      globalPopup.style.left = `${leftPos}px`;
+      globalPopup.style.top = `${topPos}px`;
+      globalPopup.classList.add("active");
+  }
+
+  function hidePopup() {
+      globalPopup.classList.remove("active");
+  }
+
+  function buildLanyardCard(wrapper, data) {
+      const card = wrapper.querySelector(".profile");
+      const user = data.discord_user || {};
+      const userId = user.id;
+      const avatar = customAvatars[userId] || (user.avatar
+          ? `https://cdn.discordapp.com/avatars/${userId}/${user.avatar}.png?size=256`
+          : `https://api.lanyard.rest/${userId}.png`);
+
+      const bannerImg = wrapper.querySelector(".hof-card-banner");
+      if (bannerImg) {
+          bannerImg.src = customBanners[userId] || `https://discord.tsunstudio.pw/api/banner/${encodeURIComponent(userId)}/image`;
+      }
+
+      card.innerHTML = `
+          <div class="lanyard-card-body">
+              <div class="lanyard-avatar-wrap">
+                  <img class="lanyard-avatar" src="${avatar}" alt="" loading="lazy">
+              </div>
+          </div>
+      `;
+
+      wrapper.addEventListener("mouseenter", () => {
+          showPopup(wrapper, data);
+
+          if (customAudioTracks[userId]) {
+              music.pause(); 
+              if (profileMusic.src !== customAudioTracks[userId]) {
+                  profileMusic.src = customAudioTracks[userId];
+                  profileMusic.currentTime = 0;
+              }
+              profileMusic.volume = Number(topVolumeSlider.value);
+              profileMusic.play().catch(() => {});
+          }
+      });
+      
+      wrapper.addEventListener("mouseleave", () => {
+          hidePopup();
+
+          if (customAudioTracks[userId]) {
+              profileMusic.pause();
+              profileMusic.src = "";
+              music.play().catch(() => {}); 
+          }
+      });
+  }
+
+  async function loadLanyardProfiles() {
+      const wrappers = Array.from(document.querySelectorAll(".profile-wrapper"));
+      wrappers.map(async (wrapper) => {
+          const card = wrapper.querySelector(".profile[data-user-id]") || wrapper.querySelector(".profile");
+          if (!card) return;
+          const userId = wrapper.dataset.userId || card.dataset.userId;
+          if (!userId) return;
+          try {
+              const response = await fetch(`https://api.lanyard.rest/v1/users/${encodeURIComponent(userId)}`);
+              const result = await response.json();
+              if (response.ok && result.success && result.data) {
+                  buildLanyardCard(wrapper, result.data);
+              }
+          } catch (error) {}
+      });
+  }
+
+  loadLanyardProfiles();
+
+  const enterScreen = document.getElementById("enter-screen");
+  enterScreen.addEventListener("click", () => {
+      music.volume = Number(topVolumeSlider.value);
+      music.currentTime = 0;
+      music.play().catch(() => {});
+      enterScreen.style.opacity = "0";
+      enterScreen.style.visibility = "hidden";
+      setTimeout(() => enterScreen.style.display = "none", 800);
+  });
+
+  /* STARFALL BACKGROUND */
+  (() => {
+      const canvas = document.getElementById("starfall-canvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d", { alpha: true });
+      let width = window.innerWidth;
+      let height = window.innerHeight;
+      let stars = [];
+
+      function resize() {
+          width = window.innerWidth;
+          height = window.innerHeight;
+          canvas.width = width;
+          canvas.height = height;
+          stars = Array.from({ length: 40 }, () => ({
+              x: Math.random() * width,
+              y: Math.random() * height,
+              r: Math.random() * 1.2 + 0.3,
+              alpha: Math.random() * 0.7 + 0.2
+          }));
+      }
+
+      function animate() {
+          ctx.clearRect(0, 0, width, height);
+          for (const s of stars) {
+              ctx.beginPath();
+              ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+              ctx.fill();
+          }
+          requestAnimationFrame(animate);
+      }
+
+      window.addEventListener("resize", resize);
+      resize();
+      animate();
+  })();
+</script>
+</body>
+</html>
